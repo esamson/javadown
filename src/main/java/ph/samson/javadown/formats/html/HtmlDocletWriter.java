@@ -1501,7 +1501,15 @@ public class HtmlDocletWriter extends HtmlDocWriter {
                 result.append(textBuff);
             }
         }
-        return pegDown.markdownToHtml(result.toString());
+
+        String html = pegDown.markdownToHtml(result.toString());
+        if (html.startsWith("<p>") && html.endsWith("</p>")
+                && html.lastIndexOf("<p>") == 0) {
+            // if html is a single paragraph, strip the surrounding <p> tags
+            html = html.substring(3, html.length() - 4);
+        }
+
+        return html;
     }
 
     /**
