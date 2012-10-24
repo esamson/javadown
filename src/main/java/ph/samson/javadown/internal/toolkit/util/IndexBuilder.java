@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.doclets.internal.toolkit.util;
+package ph.samson.javadown.internal.toolkit.util;
 
-import com.sun.tools.doclets.internal.toolkit.*;
+import ph.samson.javadown.internal.toolkit.*;
 import com.sun.javadoc.*;
 import java.util.*;
 

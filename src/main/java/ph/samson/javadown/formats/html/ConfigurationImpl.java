@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.doclets.formats.html;
+package ph.samson.javadown.formats.html;
 
-import com.sun.tools.doclets.internal.toolkit.*;
-import com.sun.tools.doclets.internal.toolkit.util.*;
+import ph.samson.javadown.internal.toolkit.*;
+import ph.samson.javadown.internal.toolkit.util.*;
 
 import com.sun.javadoc.*;
 import java.util.*;
@@ -182,11 +182,11 @@ public class ConfigurationImpl extends Configuration {
 
     /**
      * Constructor. Initialises resource for the
-     * {@link com.sun.tools.doclets.MessageRetriever}.
+     * {@link ph.samson.javadown.MessageRetriever}.
      */
     private ConfigurationImpl() {
         standardmessage = new MessageRetriever(this,
-            "com.sun.tools.doclets.formats.html.resources.standard");
+            "ph.samson.javadown.formats.html.resources.standard");
     }
 
     /**

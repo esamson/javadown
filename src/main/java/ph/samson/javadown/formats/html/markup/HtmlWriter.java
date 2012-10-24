@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.doclets.formats.html.markup;
+package ph.samson.javadown.formats.html.markup;
 
-import com.sun.tools.doclets.internal.toolkit.*;
-import com.sun.tools.doclets.internal.toolkit.util.*;
+import ph.samson.javadown.internal.toolkit.*;
+import ph.samson.javadown.internal.toolkit.util.*;
 import java.io.*;
 
 /**

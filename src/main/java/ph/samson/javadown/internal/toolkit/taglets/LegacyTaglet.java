@@ -23,13 +23,13 @@
  * questions.
  */
 
-package com.sun.tools.doclets.internal.toolkit.taglets;
+package ph.samson.javadown.internal.toolkit.taglets;
 
 import com.sun.javadoc.*;
 
 /**
  * This taglet acts as a wrapper to enable
- * {@link com.sun.tools.doclets.Taglet} type taglets to work
+ * {@link ph.samson.javadown.Taglet} type taglets to work
  * with the current version of Javadoc.
  * Note: this taglet only works with legacy taglets (those compatible with
  * Javadoc 1.4.x) that writes strings.
@@ -46,9 +46,9 @@ import com.sun.javadoc.*;
 
 public class LegacyTaglet implements Taglet {
 
-    private com.sun.tools.doclets.Taglet legacyTaglet;
+    private ph.samson.javadown.Taglet legacyTaglet;
 
-    public LegacyTaglet(com.sun.tools.doclets.Taglet t) {
+    public LegacyTaglet(ph.samson.javadown.Taglet t) {
         legacyTaglet = t;
     }
 

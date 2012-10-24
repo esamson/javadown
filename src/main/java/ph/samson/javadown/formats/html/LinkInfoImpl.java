@@ -24,11 +24,11 @@
  */
 
 
-package com.sun.tools.doclets.formats.html;
+package ph.samson.javadown.formats.html;
 
 import com.sun.javadoc.*;
-import com.sun.tools.doclets.internal.toolkit.util.*;
-import com.sun.tools.doclets.internal.toolkit.util.links.*;
+import ph.samson.javadown.internal.toolkit.util.*;
+import ph.samson.javadown.internal.toolkit.util.links.*;
 
 public class LinkInfoImpl extends LinkInfo {
 

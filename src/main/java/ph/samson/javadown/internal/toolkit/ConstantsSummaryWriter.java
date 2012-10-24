@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.doclets.internal.toolkit;
+package ph.samson.javadown.internal.toolkit;
 
 import com.sun.javadoc.*;
 import java.util.*;

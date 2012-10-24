@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.doclets.internal.toolkit.taglets;
+package ph.samson.javadown.internal.toolkit.taglets;
 
 /**
  * An abstract class for that implements the {@link Taglet} interface

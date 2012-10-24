@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.doclets.internal.toolkit.util.links;
+package ph.samson.javadown.internal.toolkit.util.links;
 
 /**
  * Stores output of a link.

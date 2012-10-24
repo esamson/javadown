@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.doclets.internal.toolkit.taglets;
+package ph.samson.javadown.internal.toolkit.taglets;
 
 /**
  * An abstract inline taglet that outputs HTML.

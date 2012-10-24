@@ -22,10 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.doclets.internal.toolkit.util;
+package ph.samson.javadown.internal.toolkit.util;
 
 import com.sun.javadoc.*;
-import com.sun.tools.doclets.internal.toolkit.Configuration;
+import ph.samson.javadown.internal.toolkit.Configuration;
 import java.util.*;
 import java.text.MessageFormat;
 

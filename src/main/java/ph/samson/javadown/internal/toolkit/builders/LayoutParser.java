@@ -22,10 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.doclets.internal.toolkit.builders;
+package ph.samson.javadown.internal.toolkit.builders;
 
-import com.sun.tools.doclets.internal.toolkit.*;
-import com.sun.tools.doclets.internal.toolkit.util.*;
+import ph.samson.javadown.internal.toolkit.*;
+import ph.samson.javadown.internal.toolkit.util.*;
 import java.io.*;
 import java.util.*;
 import org.xml.sax.*;

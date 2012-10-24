@@ -24,7 +24,7 @@
  */
 
 
-package com.sun.tools.doclets.internal.toolkit;
+package ph.samson.javadown.internal.toolkit;
 
 import java.io.*;
 import com.sun.javadoc.*;

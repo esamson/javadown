@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.doclets.internal.toolkit.taglets;
+package ph.samson.javadown.internal.toolkit.taglets;
 
 import com.sun.javadoc.*;
-import com.sun.tools.doclets.internal.toolkit.util.*;
+import ph.samson.javadown.internal.toolkit.util.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -351,8 +351,8 @@ public class TagletManager {
     private void checkTaglet(Object taglet) {
         if (taglet instanceof Taglet) {
             checkTagName(((Taglet) taglet).getName());
-        } else if (taglet instanceof com.sun.tools.doclets.Taglet) {
-            com.sun.tools.doclets.Taglet legacyTaglet = (com.sun.tools.doclets.Taglet) taglet;
+        } else if (taglet instanceof ph.samson.javadown.Taglet) {
+            ph.samson.javadown.Taglet legacyTaglet = (ph.samson.javadown.Taglet) taglet;
             customTags.remove(legacyTaglet.getName());
             customTags.put(legacyTaglet.getName(), new LegacyTaglet(legacyTaglet));
             checkTagName(legacyTaglet.getName());

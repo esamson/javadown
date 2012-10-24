@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.doclets.internal.toolkit;
+package ph.samson.javadown.internal.toolkit;
 
-import com.sun.tools.doclets.internal.toolkit.builders.*;
-import com.sun.tools.doclets.internal.toolkit.util.*;
+import ph.samson.javadown.internal.toolkit.builders.*;
+import ph.samson.javadown.internal.toolkit.util.*;
 import com.sun.javadoc.*;
 import java.util.*;
 import java.io.*;
@@ -51,7 +51,7 @@ public abstract class AbstractDoclet {
      * The only doclet that may use this toolkit is {@value}
      */
     private static final String TOOLKIT_DOCLET_NAME = new
-        com.sun.tools.doclets.formats.html.HtmlDoclet().getClass().getName();
+        ph.samson.javadown.formats.html.HtmlDoclet().getClass().getName();
 
     /**
      * Verify that the only doclet that is using this toolkit is

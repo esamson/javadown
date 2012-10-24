@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.doclets.standard;
+package ph.samson.javadown.standard;
 
 import com.sun.javadoc.*;
-import com.sun.tools.doclets.formats.html.*;
+import ph.samson.javadown.formats.html.*;
 
 
 public class Standard {

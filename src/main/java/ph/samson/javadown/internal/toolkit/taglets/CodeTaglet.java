@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.doclets.internal.toolkit.taglets;
+package ph.samson.javadown.internal.toolkit.taglets;
 
 import java.util.Map;
 import com.sun.javadoc.Tag;

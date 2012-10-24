@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.doclets.formats.html;
+package ph.samson.javadown.formats.html;
 
 import com.sun.javadoc.*;
 import java.io.*;
@@ -34,7 +34,7 @@ import java.io.*;
  * @author Atul M Dambalkar
  */
 public class SerializedFormWriterImpl extends SubWriterHolderWriter
-    implements com.sun.tools.doclets.internal.toolkit.SerializedFormWriter {
+    implements ph.samson.javadown.internal.toolkit.SerializedFormWriter {
 
     private static final String FILE_NAME = "serialized-form.html";
 

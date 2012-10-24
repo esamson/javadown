@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.doclets.formats.html;
+package ph.samson.javadown.formats.html;
 
 import com.sun.javadoc.*;
 

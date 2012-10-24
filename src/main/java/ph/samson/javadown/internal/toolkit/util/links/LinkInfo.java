@@ -23,10 +23,10 @@
  * questions.
  */
 
-package com.sun.tools.doclets.internal.toolkit.util.links;
+package ph.samson.javadown.internal.toolkit.util.links;
 
 import com.sun.javadoc.*;
-import com.sun.tools.doclets.internal.toolkit.Configuration;
+import ph.samson.javadown.internal.toolkit.Configuration;
 
 /**
  * Encapsulates information about a link.

@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.doclets.internal.toolkit.taglets;
+package ph.samson.javadown.internal.toolkit.taglets;
 
-import com.sun.tools.doclets.internal.toolkit.util.DocFinder;
+import ph.samson.javadown.internal.toolkit.util.DocFinder;
 
 /**
  * A taglet should implement this interface if it supports the inheritDoc
@@ -37,7 +37,7 @@ import com.sun.tools.doclets.internal.toolkit.util.DocFinder;
 public interface InheritableTaglet extends Taglet {
 
     /**
-     * Given an {@link com.sun.tools.doclets.internal.toolkit.util.DocFinder.Output}
+     * Given an {@link ph.samson.javadown.internal.toolkit.util.DocFinder.Output}
      * object, set its values with the appropriate information to inherit
      * documentation.
      *

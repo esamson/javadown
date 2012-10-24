@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.doclets.formats.html;
+package ph.samson.javadown.formats.html;
 
-import com.sun.tools.doclets.internal.toolkit.taglets.*;
+import ph.samson.javadown.internal.toolkit.taglets.*;
 
 /**
  * The output for HTML taglets.

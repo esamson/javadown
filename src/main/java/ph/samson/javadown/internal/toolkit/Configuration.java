@@ -23,11 +23,11 @@
  * questions.
  */
 
-package com.sun.tools.doclets.internal.toolkit;
+package ph.samson.javadown.internal.toolkit;
 
-import com.sun.tools.doclets.internal.toolkit.taglets.*;
-import com.sun.tools.doclets.internal.toolkit.util.*;
-import com.sun.tools.doclets.internal.toolkit.builders.BuilderFactory;
+import ph.samson.javadown.internal.toolkit.taglets.*;
+import ph.samson.javadown.internal.toolkit.util.*;
+import ph.samson.javadown.internal.toolkit.builders.BuilderFactory;
 import com.sun.javadoc.*;
 import java.util.*;
 import java.io.*;
@@ -254,7 +254,7 @@ public abstract class Configuration {
     public Configuration() {
         message =
             new MessageRetriever(this,
-            "com.sun.tools.doclets.internal.toolkit.resources.doclets");
+            "ph.samson.javadown.internal.toolkit.resources.doclets");
         excludedDocFileDirs = new HashSet();
         excludedQualifiers = new HashSet();
     }

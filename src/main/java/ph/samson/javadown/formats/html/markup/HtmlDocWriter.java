@@ -23,20 +23,20 @@
  * questions.
  */
 
-package com.sun.tools.doclets.formats.html.markup;
+package ph.samson.javadown.formats.html.markup;
 
 import java.io.*;
 import java.util.*;
 
 import com.sun.javadoc.*;
-import com.sun.tools.doclets.internal.toolkit.*;
+import ph.samson.javadown.internal.toolkit.*;
 
 
 /**
  * Class for the Html Format Code Generation specific to JavaDoc.
  * This Class contains methods related to the Html Code Generation which
- * are used by the Sub-Classes in the package com.sun.tools.doclets.standard
- * and com.sun.tools.doclets.oneone.
+ * are used by the Sub-Classes in the package ph.samson.javadown.standard
+ * and ph.samson.javadown.oneone.
  *
  * @since 1.2
  * @author Atul M Dambalkar

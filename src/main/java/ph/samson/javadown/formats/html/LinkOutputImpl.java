@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.doclets.formats.html;
+package ph.samson.javadown.formats.html;
 
-import com.sun.tools.doclets.internal.toolkit.util.links.*;
+import ph.samson.javadown.internal.toolkit.util.links.*;
 
 /**
  * Stores output of a link.
