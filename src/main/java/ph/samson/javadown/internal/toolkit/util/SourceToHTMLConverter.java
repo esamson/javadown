@@ -130,13 +130,14 @@ public class SourceToHTMLConverter {
             if (sp == null)
                 return;
             Reader r;
+            /* SourcePositionImpl is not public in my version of Java
             // temp hack until we can update SourcePosition API.
             if (sp instanceof com.sun.tools.javadoc.SourcePositionImpl) {
                 FileObject fo = ((com.sun.tools.javadoc.SourcePositionImpl) sp).fileObject();
                 if (fo == null)
                     return;
                 r = fo.openReader(true);
-            } else {
+            } else */{
                 File file = sp.file();
                 if (file == null)
                     return;
