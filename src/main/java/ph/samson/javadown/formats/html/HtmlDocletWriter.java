@@ -34,6 +34,7 @@ import com.sun.javadoc.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import org.pegdown.PegDownProcessor;
 
 
 /**
@@ -46,6 +47,12 @@ import java.util.*;
  * @author Robert Field
  */
 public class HtmlDocletWriter extends HtmlDocWriter {
+
+    /**
+     * PegDownProcessor is not thread-safe but we assume this is never used
+     * concurrently.
+     */
+    private static final PegDownProcessor pegDown = new PegDownProcessor();
 
     /**
      * Relative path from the file getting generated to the destination
@@ -1494,7 +1501,7 @@ public class HtmlDocletWriter extends HtmlDocWriter {
                 result.append(textBuff);
             }
         }
-        return result.toString();
+        return pegDown.markdownToHtml(result.toString());
     }
 
     /**
