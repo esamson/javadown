@@ -23,13 +23,13 @@
  * questions.
  */
 
-package ph.samson.javadown.standard;
+package ph.samson.javadown;
 
 import com.sun.javadoc.*;
 import ph.samson.javadown.formats.html.*;
 
 
-public class Standard {
+public class Javadown {
 
     public static final HtmlDoclet htmlDoclet = new HtmlDoclet();
 
