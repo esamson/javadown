@@ -1496,6 +1496,9 @@ public class HtmlDocletWriter extends HtmlDocWriter {
                 while (lines.hasMoreTokens()) {
                     StringBuffer line = new StringBuffer(lines.nextToken());
                     Util.replaceTabs(configuration.sourcetab, line);
+                    if (line.charAt(0) == ' ') {
+                        line.deleteCharAt(0);
+                    }
                     textBuff.append(line.toString());
                 }
                 result.append(textBuff);
