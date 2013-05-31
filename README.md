@@ -4,10 +4,15 @@
 be written in [Markdown syntax](http://daringfireball.net/projects/markdown/syntax).
 All the standard javadocs tags are supported.
 
-## Dependencies
+## Installation
 
-[pegdown](https://github.com/sirthias/pegdown) is used for Markdown processing.
-If you use Maven, this should not concern you.
+*javadown* is released to Maven Central. You may use it directly in your maven
+projects.
+
+If you're not using maven, you may still download the jar manually from
+[Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22ph.samson%22%20AND%20a%3A%22javadown%22).
+Note that [pegdown](https://github.com/sirthias/pegdown) is used for Markdown
+processing. You'll need that and all its dependencies, too.
 
 ## Usage
 
