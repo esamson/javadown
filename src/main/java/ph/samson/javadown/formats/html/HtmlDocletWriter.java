@@ -1505,7 +1505,7 @@ public class HtmlDocletWriter extends HtmlDocWriter {
             }
         }
 
-        String html = pegDown.markdownToHtml(result.toString());
+        String html = pegDown.markdownToHtml(result.append('\n').toString());
         if (html.startsWith("<p>") && html.endsWith("</p>")
                 && html.lastIndexOf("<p>") == 0) {
             // if html is a single paragraph, strip the surrounding <p> tags
