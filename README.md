@@ -30,7 +30,7 @@ by the javadoc tool. For example, in Maven one would say:
             <docletArtifact>
                 <groupId>ph.samson</groupId>
                 <artifactId>javadown</artifactId>
-                <version>0.1</version>
+                <version>0.2</version>
             </docletArtifact>
         </configuration>
     </plugin>
