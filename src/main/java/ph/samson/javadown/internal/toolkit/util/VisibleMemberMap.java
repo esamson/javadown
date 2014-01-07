@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1999, 2005, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1999, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -28,6 +28,7 @@ package ph.samson.javadown.internal.toolkit.util;
 import com.sun.javadoc.*;
 import ph.samson.javadown.internal.toolkit.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * A data structure that encapsulates the visible members of a particular
@@ -54,30 +55,31 @@ public class VisibleMemberMap {
     public static final int METHODS         = 4;
     public static final int ANNOTATION_TYPE_MEMBER_OPTIONAL = 5;
     public static final int ANNOTATION_TYPE_MEMBER_REQUIRED = 6;
+    public static final int PROPERTIES      = 7;
 
     /**
      * The total number of member types is {@value}.
      */
-    public static final int NUM_MEMBER_TYPES = 7;
+    public static final int NUM_MEMBER_TYPES = 8;
 
     public static final String STARTLEVEL = "start";
 
     /**
      * List of ClassDoc objects for which ClassMembers objects are built.
      */
-    private final List visibleClasses = new ArrayList();
+    private final List<ClassDoc> visibleClasses = new ArrayList<ClassDoc>();
 
     /**
      * Map for each member name on to a map which contains members with same
      * name-signature. The mapped map will contain mapping for each MemberDoc
      * onto it's respecive level string.
      */
-    private final Map memberNameMap = new HashMap();
+    private final Map<Object,Map<ProgramElementDoc,String>> memberNameMap = new HashMap<Object,Map<ProgramElementDoc,String>>();
 
     /**
      * Map of class and it's ClassMembers object.
      */
-    private final Map classMap = new HashMap();
+    private final Map<ClassDoc,ClassMembers> classMap = new HashMap<ClassDoc,ClassMembers>();
 
     /**
      * Type whose visible members are requested.  This is the leaf of
@@ -94,6 +96,13 @@ public class VisibleMemberMap {
      * Deprected members should be excluded or not?
      */
     private final boolean nodepr;
+
+    private static final Map<ClassDoc, ProgramElementDoc[]> propertiesCache =
+            new HashMap<ClassDoc, ProgramElementDoc[]>();
+    private static final Map<ProgramElementDoc, ProgramElementDoc> classPropertiesMap =
+            new HashMap<ProgramElementDoc, ProgramElementDoc>();
+    private static final Map<ProgramElementDoc, GetterSetter> getterSetterMap =
+            new HashMap<ProgramElementDoc, GetterSetter>();
 
     /**
      * Construct a VisibleMemberMap of the given type for the given
@@ -116,9 +125,36 @@ public class VisibleMemberMap {
      *
      * @return the list of visible classes in this map.
      */
-    public List getVisibleClassesList() {
+    public List<ClassDoc> getVisibleClassesList() {
         sort(visibleClasses);
         return visibleClasses;
+    }
+
+    /**
+     * Returns the property field documentation belonging to the given member.
+     * @param ped the member for which the property documentation is needed.
+     * @return the property field documentation, null if there is none.
+     */
+    public ProgramElementDoc getPropertyMemberDoc(ProgramElementDoc ped) {
+        return classPropertiesMap.get(ped);
+    }
+
+    /**
+     * Returns the getter documentation belonging to the given property method.
+     * @param propertyMethod the method for which the getter is needed.
+     * @return the getter documentation, null if there is none.
+     */
+    public ProgramElementDoc getGetterForProperty(ProgramElementDoc propertyMethod) {
+        return getterSetterMap.get(propertyMethod).getGetter();
+    }
+
+    /**
+     * Returns the setter documentation belonging to the given property method.
+     * @param propertyMethod the method for which the setter is needed.
+     * @return the setter documentation, null if there is none.
+     */
+    public ProgramElementDoc getSetterForProperty(ProgramElementDoc propertyMethod) {
+        return getterSetterMap.get(propertyMethod).getSetter();
     }
 
     /**
@@ -128,10 +164,10 @@ public class VisibleMemberMap {
      * @param configuation the current configuration of the doclet.
      * @return the package private members inherited by the class.
      */
-    private List getInheritedPackagePrivateMethods(Configuration configuration) {
-        List results = new ArrayList();
-        for (Iterator iter = visibleClasses.iterator(); iter.hasNext(); ) {
-            ClassDoc currentClass = (ClassDoc) iter.next();
+    private List<ProgramElementDoc> getInheritedPackagePrivateMethods(Configuration configuration) {
+        List<ProgramElementDoc> results = new ArrayList<ProgramElementDoc>();
+        for (Iterator<ClassDoc> iter = visibleClasses.iterator(); iter.hasNext(); ) {
+            ClassDoc currentClass = iter.next();
             if (currentClass != classdoc &&
                 currentClass.isPackagePrivate() &&
                 !Util.isLinkable(currentClass, configuration)) {
@@ -150,8 +186,8 @@ public class VisibleMemberMap {
      *
      * @param configuation the current configuration of the doclet.
      */
-    public List getLeafClassMembers(Configuration configuration) {
-        List result = getMembersFor(classdoc);
+    public List<ProgramElementDoc> getLeafClassMembers(Configuration configuration) {
+        List<ProgramElementDoc> result = getMembersFor(classdoc);
         result.addAll(getInheritedPackagePrivateMethods(configuration));
         return result;
     }
@@ -163,10 +199,10 @@ public class VisibleMemberMap {
      *
      * @return the list of members for the given class.
      */
-    public List getMembersFor(ClassDoc cd) {
-        ClassMembers clmembers = (ClassMembers)(classMap.get(cd));
+    public List<ProgramElementDoc> getMembersFor(ClassDoc cd) {
+        ClassMembers clmembers = classMap.get(cd);
         if (clmembers == null) {
-            return new ArrayList();
+            return new ArrayList<ProgramElementDoc>();
         }
         return clmembers.getMembers();
     }
@@ -175,11 +211,11 @@ public class VisibleMemberMap {
      * Sort the given mixed list of classes and interfaces to a list of
      * classes followed by interfaces traversed. Don't sort alphabetically.
      */
-    private void sort(List list) {
-        List classes = new ArrayList();
-        List interfaces = new ArrayList();
+    private void sort(List<ClassDoc> list) {
+        List<ClassDoc> classes = new ArrayList<ClassDoc>();
+        List<ClassDoc> interfaces = new ArrayList<ClassDoc>();
         for (int i = 0; i < list.size(); i++) {
-            ClassDoc cd = (ClassDoc)list.get(i);
+            ClassDoc cd = list.get(i);
             if (cd.isClass()) {
                 classes.add(cd);
             } else {
@@ -191,22 +227,22 @@ public class VisibleMemberMap {
         list.addAll(interfaces);
     }
 
-    private void fillMemberLevelMap(List list, String level) {
+    private void fillMemberLevelMap(List<ProgramElementDoc> list, String level) {
         for (int i = 0; i < list.size(); i++) {
-            Object key = getMemberKey((ProgramElementDoc)list.get(i));
-            Map memberLevelMap = (Map) memberNameMap.get(key);
+            Object key = getMemberKey(list.get(i));
+            Map<ProgramElementDoc,String> memberLevelMap = memberNameMap.get(key);
             if (memberLevelMap == null) {
-                memberLevelMap = new HashMap();
+                memberLevelMap = new HashMap<ProgramElementDoc,String>();
                 memberNameMap.put(key, memberLevelMap);
             }
             memberLevelMap.put(list.get(i), level);
         }
     }
 
-    private void purgeMemberLevelMap(List list, String level) {
+    private void purgeMemberLevelMap(List<ProgramElementDoc> list, String level) {
         for (int i = 0; i < list.size(); i++) {
-            Object key = getMemberKey((ProgramElementDoc)list.get(i));
-            Map memberLevelMap = (Map) memberNameMap.get(key);
+            Object key = getMemberKey(list.get(i));
+            Map<ProgramElementDoc, String> memberLevelMap = memberNameMap.get(key);
             if (level.equals(memberLevelMap.get(list.get(i))))
                 memberLevelMap.remove(list.get(i));
         }
@@ -218,10 +254,10 @@ public class VisibleMemberMap {
      * type variables in consideration when comparing.
      */
     private class ClassMember {
-        private Set members;
+        private Set<ProgramElementDoc> members;
 
         public ClassMember(ProgramElementDoc programElementDoc) {
-            members = new HashSet();
+            members = new HashSet<ProgramElementDoc>();
             members.add(programElementDoc);
         }
 
@@ -230,7 +266,7 @@ public class VisibleMemberMap {
         }
 
         public boolean isEqual(MethodDoc member) {
-            for (Iterator iter = members.iterator(); iter.hasNext(); ) {
+            for (Iterator<ProgramElementDoc> iter = members.iterator(); iter.hasNext(); ) {
                 MethodDoc member2 = (MethodDoc) iter.next();
                 if (Util.executableMembersEqual(member, member2)) {
                     members.add(member);
@@ -256,7 +292,7 @@ public class VisibleMemberMap {
         /**
          * List of inherited members from the mapping class.
          */
-        private List members = new ArrayList();
+        private List<ProgramElementDoc> members = new ArrayList<ProgramElementDoc>();
 
         /**
          * Level/Depth of inheritance.
@@ -268,7 +304,7 @@ public class VisibleMemberMap {
          *
          * @return List Inherited members.
          */
-        public List getMembers() {
+        public List<ProgramElementDoc> getMembers() {
             return members;
         }
 
@@ -276,11 +312,11 @@ public class VisibleMemberMap {
             this.mappingClass = mappingClass;
             this.level = level;
             if (classMap.containsKey(mappingClass) &&
-                        level.startsWith(((ClassMembers) classMap.get(mappingClass)).level)) {
+                        level.startsWith(classMap.get(mappingClass).level)) {
                 //Remove lower level class so that it can be replaced with
                 //same class found at higher level.
                 purgeMemberLevelMap(getClassMembers(mappingClass, false),
-                    ((ClassMembers) classMap.get(mappingClass)).level);
+                    classMap.get(mappingClass).level);
                 classMap.remove(mappingClass);
                 visibleClasses.remove(mappingClass);
             }
@@ -326,15 +362,15 @@ public class VisibleMemberMap {
          * Adjust member-level-map, class-map.
          */
         private void addMembers(ClassDoc fromClass) {
-            List cdmembers = getClassMembers(fromClass, true);
-            List incllist = new ArrayList();
+            List<ProgramElementDoc> cdmembers = getClassMembers(fromClass, true);
+            List<ProgramElementDoc> incllist = new ArrayList<ProgramElementDoc>();
             for (int i = 0; i < cdmembers.size(); i++) {
-                ProgramElementDoc pgmelem =
-                    (ProgramElementDoc)(cdmembers.get(i));
-                if (!found(members, pgmelem) &&
-                    memberIsVisible(pgmelem) &&
-                    !isOverridden(pgmelem, level)) {
-                    incllist.add(pgmelem);
+                ProgramElementDoc pgmelem = cdmembers.get(i);
+                if (!found(members, pgmelem)
+                    && memberIsVisible(pgmelem)
+                    && !isOverridden(pgmelem, level)
+                    && !isTreatedAsPrivate(pgmelem)) {
+                        incllist.add(pgmelem);
                 }
             }
             if (incllist.size() > 0) {
@@ -342,6 +378,20 @@ public class VisibleMemberMap {
             }
             members.addAll(incllist);
             fillMemberLevelMap(getClassMembers(fromClass, false), level);
+        }
+
+        private boolean isTreatedAsPrivate(ProgramElementDoc pgmelem) {
+            if (!Configuration.getJavafxJavadoc()) {
+                return false;
+            }
+
+            if (pgmelem.isPrivate() || pgmelem.isPackagePrivate()) {
+                return true;
+            }
+
+            Tag[] aspTags = pgmelem.tags("@treatAsPrivate");
+            boolean result = (aspTags != null) && (aspTags.length > 0);
+            return result;
         }
 
         /**
@@ -373,7 +423,7 @@ public class VisibleMemberMap {
         /**
          * Return all available class members.
          */
-        private List getClassMembers(ClassDoc cd, boolean filter) {
+        private List<ProgramElementDoc> getClassMembers(ClassDoc cd, boolean filter) {
             if (cd.isEnum() && kind == CONSTRUCTORS) {
                 //If any of these rules are hit, return empty array because
                 //we don't document these members ever.
@@ -405,6 +455,10 @@ public class VisibleMemberMap {
                     break;
                 case METHODS:
                     members = cd.methods(filter);
+                    checkOnPropertiesTags((MethodDoc[])members);
+                    break;
+                case PROPERTIES:
+                    members = properties(cd, filter);
                     break;
                 default:
                     members = new ProgramElementDoc[0];
@@ -428,21 +482,20 @@ public class VisibleMemberMap {
          */
         private AnnotationTypeElementDoc[] filter(AnnotationTypeDoc doc,
             boolean required) {
-            AnnotationTypeElementDoc[] members = ((AnnotationTypeDoc) doc).elements();
-            List targetMembers = new ArrayList();
+            AnnotationTypeElementDoc[] members = doc.elements();
+            List<AnnotationTypeElementDoc> targetMembers = new ArrayList<AnnotationTypeElementDoc>();
             for (int i = 0; i < members.length; i++) {
                 if ((required && members[i].defaultValue() == null) ||
                      ((!required) && members[i].defaultValue() != null)){
                     targetMembers.add(members[i]);
                 }
             }
-            return (AnnotationTypeElementDoc[])
-                targetMembers.toArray(new AnnotationTypeElementDoc[]{});
+            return targetMembers.toArray(new AnnotationTypeElementDoc[]{});
         }
 
-        private boolean found(List list, ProgramElementDoc elem) {
+        private boolean found(List<ProgramElementDoc> list, ProgramElementDoc elem) {
             for (int i = 0; i < list.size(); i++) {
-                ProgramElementDoc pgmelem = (ProgramElementDoc)list.get(i);
+                ProgramElementDoc pgmelem = list.get(i);
                 if (Util.matches(pgmelem, elem)) {
                     return true;
                 }
@@ -457,13 +510,13 @@ public class VisibleMemberMap {
          * level "111".
          */
         private boolean isOverridden(ProgramElementDoc pgmdoc, String level) {
-            Map memberLevelMap = (Map) memberNameMap.get(getMemberKey(pgmdoc));
+            Map<?,String> memberLevelMap = (Map<?,String>) memberNameMap.get(getMemberKey(pgmdoc));
             if (memberLevelMap == null)
                 return false;
             String mappedlevel = null;
-            Iterator iterator = memberLevelMap.values().iterator();
+            Iterator<String> iterator = memberLevelMap.values().iterator();
             while (iterator.hasNext()) {
-                mappedlevel = (String)(iterator.next());
+                mappedlevel = iterator.next();
                 if (mappedlevel.equals(STARTLEVEL) ||
                     (level.startsWith(mappedlevel) &&
                      !level.equals(mappedlevel))) {
@@ -471,6 +524,198 @@ public class VisibleMemberMap {
                 }
             }
             return false;
+        }
+
+        private ProgramElementDoc[] properties(final ClassDoc cd, final boolean filter) {
+            final MethodDoc[] allMethods = cd.methods(filter);
+            final FieldDoc[] allFields = cd.fields();
+
+            if (propertiesCache.containsKey(cd)) {
+                return propertiesCache.get(cd);
+            }
+
+            final List<MethodDoc> result = new ArrayList<MethodDoc>();
+
+            for (final MethodDoc propertyMethod : allMethods) {
+
+                if (!isPropertyMethod(propertyMethod)) {
+                    continue;
+                }
+
+                final MethodDoc getter = getterForField(allMethods, propertyMethod);
+                final MethodDoc setter = setterForField(allMethods, propertyMethod);
+                final FieldDoc field = fieldForProperty(allFields, propertyMethod);
+
+                addToPropertiesMap(setter, getter, propertyMethod, field);
+                getterSetterMap.put(propertyMethod, new GetterSetter(getter, setter));
+                result.add(propertyMethod);
+            }
+            final ProgramElementDoc[] resultAray =
+                    result.toArray(new ProgramElementDoc[result.size()]);
+            propertiesCache.put(cd, resultAray);
+            return resultAray;
+        }
+
+        private void addToPropertiesMap(MethodDoc setter,
+                                        MethodDoc getter,
+                                        MethodDoc propertyMethod,
+                                        FieldDoc field) {
+            if ((field == null)
+                    || (field.getRawCommentText() == null)
+                    || field.getRawCommentText().length() == 0) {
+                addToPropertiesMap(setter, propertyMethod);
+                addToPropertiesMap(getter, propertyMethod);
+            } else {
+                addToPropertiesMap(getter, field);
+                addToPropertiesMap(setter, field);
+                addToPropertiesMap(propertyMethod, field);
+            }
+        }
+
+        private void addToPropertiesMap(ProgramElementDoc propertyMethod,
+                                        ProgramElementDoc commentSource) {
+            if (null == propertyMethod || null == commentSource) {
+                return;
+            }
+            final String methodRawCommentText = propertyMethod.getRawCommentText();
+            if (null == methodRawCommentText || 0 == methodRawCommentText.length()) {
+                classPropertiesMap.put(propertyMethod, commentSource);
+            }
+        }
+
+        private MethodDoc getterForField(MethodDoc[] methods,
+                                         MethodDoc propertyMethod) {
+            final String propertyMethodName = propertyMethod.name();
+            final String fieldName =
+                    propertyMethodName.substring(0,
+                            propertyMethodName.lastIndexOf("Property"));
+            final String fieldNameUppercased =
+                    "" + Character.toUpperCase(fieldName.charAt(0))
+                                            + fieldName.substring(1);
+            final String getterName;
+            final String fieldTypeName = propertyMethod.returnType().toString();
+            if ("boolean".equals(fieldTypeName)
+                    || fieldTypeName.endsWith("BooleanProperty")) {
+                getterName = "is" + fieldNameUppercased;
+            } else {
+                getterName = "get" + fieldNameUppercased;
+            }
+
+            for (MethodDoc methodDoc : methods) {
+                if (getterName.equals(methodDoc.name())) {
+                    if (0 == methodDoc.parameters().length
+                            && (methodDoc.isPublic() || methodDoc.isProtected())) {
+                        return methodDoc;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private MethodDoc setterForField(MethodDoc[] methods,
+                                         MethodDoc propertyMethod) {
+            final String propertyMethodName = propertyMethod.name();
+            final String fieldName =
+                    propertyMethodName.substring(0,
+                            propertyMethodName.lastIndexOf("Property"));
+            final String fieldNameUppercased =
+                    "" + Character.toUpperCase(fieldName.charAt(0))
+                                             + fieldName.substring(1);
+            final String setter = "set" + fieldNameUppercased;
+
+            for (MethodDoc methodDoc : methods) {
+                if (setter.equals(methodDoc.name())) {
+                    if (1 == methodDoc.parameters().length
+                            && "void".equals(methodDoc.returnType().simpleTypeName())
+                            && (methodDoc.isPublic() || methodDoc.isProtected())) {
+                        return methodDoc;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private FieldDoc fieldForProperty(FieldDoc[] fields, MethodDoc property) {
+
+            for (FieldDoc field : fields) {
+                final String fieldName = field.name();
+                final String propertyName = fieldName + "Property";
+                if (propertyName.equals(property.name())) {
+                    return field;
+                }
+            }
+            return null;
+        }
+
+        // properties aren't named setA* or getA*
+        private final Pattern pattern = Pattern.compile("[sg]et\\p{Upper}.*");
+        private boolean isPropertyMethod(MethodDoc method) {
+            if (!method.name().endsWith("Property")) {
+                return false;
+            }
+
+            if (! memberIsVisible(method)) {
+                return false;
+            }
+
+            if (pattern.matcher(method.name()).matches()) {
+                return false;
+            }
+
+            return 0 == method.parameters().length
+                    && !"void".equals(method.returnType().simpleTypeName());
+        }
+
+        private void checkOnPropertiesTags(MethodDoc[] members) {
+            for (MethodDoc methodDoc: members) {
+                for (Tag tag: methodDoc.tags()) {
+                    String tagName = tag.name();
+                    if (tagName.equals("@propertySetter")
+                            || tagName.equals("@propertyGetter")
+                            || tagName.equals("@propertyDescription")) {
+                        if (!isPropertyGetterOrSetter(members, methodDoc)) {
+                            System.out.println(methodDoc.containingClass().qualifiedName()
+                                    +  ": "
+                                    + Util.RESOURCE_BUNDLE.getString("doclet.javafx_tag_misuse"));
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        private boolean isPropertyGetterOrSetter(MethodDoc[] members,
+                                                 MethodDoc methodDoc) {
+            boolean found = false;
+            String propertyName = Util.propertyNameFromMethodName(methodDoc.name());
+            if (!propertyName.isEmpty()) {
+                String propertyMethodName = propertyName + "Property";
+                for (MethodDoc member: members) {
+                    if (member.name().equals(propertyMethodName)) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            return found;
+        }
+    }
+
+    private class GetterSetter {
+        private final ProgramElementDoc getter;
+        private final ProgramElementDoc setter;
+
+        public GetterSetter(ProgramElementDoc getter, ProgramElementDoc setter) {
+            this.getter = getter;
+            this.setter = setter;
+        }
+
+        public ProgramElementDoc getGetter() {
+            return getter;
+        }
+
+        public ProgramElementDoc getSetter() {
+            return setter;
         }
     }
 
@@ -480,11 +725,15 @@ public class VisibleMemberMap {
      * @return true if this map has no visible members.
      */
     public boolean noVisibleMembers() {
-        return noVisibleMembers;
+        if (Configuration.getJavafxJavadoc()) {
+            return false;
+        } else {
+            return noVisibleMembers;
+        }
     }
 
     private ClassMember getClassMember(MethodDoc member) {
-        for (Iterator iter = memberNameMap.keySet().iterator(); iter.hasNext();) {
+        for (Iterator<?> iter = memberNameMap.keySet().iterator(); iter.hasNext();) {
             Object key = iter.next();
             if (key instanceof String) {
                 continue;

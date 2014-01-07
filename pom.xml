@@ -38,8 +38,8 @@
         <dependency>
             <groupId>com.sun</groupId>
             <artifactId>tools</artifactId>
+            <version>${java.version}</version>
             <scope>system</scope>
-            <version>6</version>
             <systemPath>${tools.jar}</systemPath>
             <optional>true</optional>
         </dependency>

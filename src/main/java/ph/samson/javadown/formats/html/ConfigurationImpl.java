@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1998, 2005, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1998, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -31,6 +31,7 @@ import ph.samson.javadown.internal.toolkit.util.*;
 import com.sun.javadoc.*;
 import java.util.*;
 import java.io.*;
+import java.net.*;
 
 /**
  * Configure the output based on the command line options.
@@ -48,6 +49,7 @@ import java.io.*;
  * @author Robert Field.
  * @author Atul Dambalkar.
  * @author Jamie Ho
+ * @author Bhavesh Patel (Modified)
  */
 public class ConfigurationImpl extends Configuration {
 
@@ -108,6 +110,11 @@ public class ConfigurationImpl extends Configuration {
      * Argument for command line option "-stylesheetfile".
      */
     public String stylesheetfile = "";
+
+    /**
+     * Argument for command line option "-Xdocrootparent".
+     */
+    public String docrootparent = "";
 
     /**
      * True if command line option "-nohelp" is used. Default value is false.
@@ -220,49 +227,49 @@ public class ConfigurationImpl extends Configuration {
             String[] os = options[oi];
             String opt = os[0].toLowerCase();
             if (opt.equals("-footer")) {
-                footer =  os[1];
-            } else  if (opt.equals("-header")) {
-                header =  os[1];
-            } else  if (opt.equals("-packagesheader")) {
-                packagesheader =  os[1];
-            } else  if (opt.equals("-doctitle")) {
-                doctitle =  os[1];
-            } else  if (opt.equals("-windowtitle")) {
-                windowtitle =  os[1];
-            } else  if (opt.equals("-top")) {
-                top =  os[1];
-            } else  if (opt.equals("-bottom")) {
-                bottom =  os[1];
-            } else  if (opt.equals("-helpfile")) {
-                helpfile =  os[1];
-            } else  if (opt.equals("-stylesheetfile")) {
-                stylesheetfile =  os[1];
-            } else  if (opt.equals("-charset")) {
-                charset =  os[1];
-            } else  if (opt.equals("-nohelp")) {
+                footer = os[1];
+            } else if (opt.equals("-header")) {
+                header = os[1];
+            } else if (opt.equals("-packagesheader")) {
+                packagesheader = os[1];
+            } else if (opt.equals("-doctitle")) {
+                doctitle = os[1];
+            } else if (opt.equals("-windowtitle")) {
+                windowtitle = os[1];
+            } else if (opt.equals("-top")) {
+                top = os[1];
+            } else if (opt.equals("-bottom")) {
+                bottom = os[1];
+            } else if (opt.equals("-helpfile")) {
+                helpfile = os[1];
+            } else if (opt.equals("-stylesheetfile")) {
+                stylesheetfile = os[1];
+            } else if (opt.equals("-charset")) {
+                charset = os[1];
+            } else if (opt.equals("-xdocrootparent")) {
+                docrootparent = os[1];
+            } else if (opt.equals("-nohelp")) {
                 nohelp = true;
-            } else  if (opt.equals("-splitindex")) {
+            } else if (opt.equals("-splitindex")) {
                 splitindex = true;
-            } else  if (opt.equals("-noindex")) {
+            } else if (opt.equals("-noindex")) {
                 createindex = false;
-            } else  if (opt.equals("-use")) {
+            } else if (opt.equals("-use")) {
                 classuse = true;
-            } else  if (opt.equals("-notree")) {
+            } else if (opt.equals("-notree")) {
                 createtree = false;
-            } else  if (opt.equals("-nodeprecatedlist")) {
+            } else if (opt.equals("-nodeprecatedlist")) {
                 nodeprecatedlist = true;
-            } else  if (opt.equals("-nosince")) {
-                nosince = true;
-            } else  if (opt.equals("-nonavbar")) {
+            } else if (opt.equals("-nonavbar")) {
                 nonavbar = true;
-            } else  if (opt.equals("-nooverview")) {
+            } else if (opt.equals("-nooverview")) {
                 nooverview = true;
-            } else  if (opt.equals("-overview")) {
+            } else if (opt.equals("-overview")) {
                 overview = true;
             }
         }
         if (root.specifiedClasses().length > 0) {
-            Map map = new HashMap();
+            Map<String,PackageDoc> map = new HashMap<String,PackageDoc>();
             PackageDoc pd;
             ClassDoc[] classes = root.classes();
             for (int i = 0; i < classes.length; i++) {
@@ -322,7 +329,8 @@ public class ConfigurationImpl extends Configuration {
                    option.equals("-helpfile") ||
                    option.equals("-stylesheetfile") ||
                    option.equals("-charset") ||
-                   option.equals("-overview")) {
+                   option.equals("-overview") ||
+                   option.equals("-xdocrootparent")) {
             return 2;
         } else {
             return 0;
@@ -372,6 +380,13 @@ public class ConfigurationImpl extends Configuration {
                     return false;
                 }
                 nohelp = true;
+            } else if (opt.equals("-xdocrootparent")) {
+                try {
+                    new URL(os[1]);
+                } catch (MalformedURLException e) {
+                    reporter.printError(getText("doclet.MalformedURL", os[1]));
+                    return false;
+                }
             } else if (opt.equals("-overview")) {
                 if (nooverview == true) {
                     reporter.printError(getText("doclet.Option_conflict",
@@ -490,7 +505,17 @@ public class ConfigurationImpl extends Configuration {
     /**
      * {@inheritDoc}
      */
-    public Comparator getMemberComparator() {
+    public Comparator<ProgramElementDoc> getMemberComparator() {
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Locale getLocale() {
+        if (root instanceof com.sun.tools.javadoc.RootDocImpl)
+            return ((com.sun.tools.javadoc.RootDocImpl)root).getLocale();
+        else
+            return Locale.getDefault();
     }
 }
