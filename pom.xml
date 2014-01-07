@@ -58,10 +58,10 @@
 
     <profiles>
         <profile>
-            <id>osx-tools.jar</id>
+            <id>unix-tools.jar</id>
             <activation>
                 <os>
-                    <family>mac</family>
+                    <family>unix</family>
                 </os>
             </activation>
             <properties>
