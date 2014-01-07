@@ -41,6 +41,7 @@
             <scope>system</scope>
             <version>6</version>
             <systemPath>${tools.jar}</systemPath>
+            <optional>true</optional>
         </dependency>
     </dependencies>
     <build>
@@ -64,7 +65,7 @@
                 </os>
             </activation>
             <properties>
-                <tools.jar>${java.home}/../Classes/classes.jar</tools.jar>
+                <tools.jar>${java.home}/../lib/tools.jar</tools.jar>
             </properties>
         </profile>
     </profiles>
