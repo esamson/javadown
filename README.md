@@ -24,13 +24,13 @@ by the javadoc tool. For example, in Maven one would say:
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9</version>
+        <version>2.9.1</version>
         <configuration>
             <doclet>ph.samson.javadown.Javadown</doclet>
             <docletArtifact>
                 <groupId>ph.samson</groupId>
                 <artifactId>javadown</artifactId>
-                <version>0.2</version>
+                <version>1.0</version>
             </docletArtifact>
         </configuration>
     </plugin>
