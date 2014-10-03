@@ -2396,6 +2396,7 @@ public class HtmlDocletWriter extends HtmlDocWriter {
             boolean isFirstSentence) {
         StringBuilder result = new StringBuilder();
         boolean textTagChange = false;
+        boolean inlineTagLineBreak = false;
         // Array of all possible inline tags for this javadoc run
         configuration.tagletManager.checkTags(doc, tags, true);
         for (int i = 0; i < tags.length; i++) {
@@ -2403,12 +2404,14 @@ public class HtmlDocletWriter extends HtmlDocWriter {
             String tagName = tagelem.name();
             if (tagelem instanceof SeeTag) {
                 result.append(seeTagToString((SeeTag)tagelem));
+                inlineTagLineBreak = true;
             } else if (! tagName.equals("Text")) {
                 int originalLength = result.length();
                 TagletOutput output = TagletWriter.getInlineTagOuput(
                     configuration.tagletManager, holderTag,
                     tagelem, getTagletWriterInstance(isFirstSentence));
                 result.append(output == null ? "" : output.toString());
+                inlineTagLineBreak = true;
                 if (originalLength == 0 && isFirstSentence && tagelem.name().equals("@inheritDoc") && result.length() > 0) {
                     break;
                 } else if (configuration.docrootparent.length() > 0 &&
@@ -2446,7 +2449,9 @@ public class HtmlDocletWriter extends HtmlDocWriter {
                 while (lines.hasMoreTokens()) {
                     StringBuilder line = new StringBuilder(lines.nextToken());
                     Util.replaceTabs(configuration.sourcetab, line);
-                    if (line.charAt(0) == ' ') {
+                    if (inlineTagLineBreak) {
+                        inlineTagLineBreak = false;
+                    } else if (line.charAt(0) == ' ') {
                         line.deleteCharAt(0);
                     }
                     textBuff.append(line.toString());
